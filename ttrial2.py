@@ -8,7 +8,7 @@ import win32gui
 import win32process
 import psutil
 # Ensure the script supports UTF-8 output
-sys.stdout.reconfigure(encoding='utf-8')
+
 
 # List of keywords to check in the window title
 
