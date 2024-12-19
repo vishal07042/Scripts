@@ -1,0 +1,36 @@
+import time
+import win32gui
+import win32api  # Import win32api to use the CloseWindow function
+
+
+arr = ["hey"]
+
+
+def get_active_window_title():
+    hwnd = win32gui.GetForegroundWindow()  # Get the handle to the active window
+    if hwnd:
+        return win32gui.GetWindowText(hwnd), hwnd  # Return title and hwnd
+    return None, None  # Return None for both if no window
+
+
+if __name__ == "__main__":
+    try:
+        print("Tracking active window titles every 5 seconds. Press Ctrl+C to stop.")
+        while True:
+            title, hwnd = get_active_window_title()  # Get both title and hwnd
+            if title:
+                # Handle potential UnicodeEncodeError
+                try:
+                    print(f"Active window title: {title}")
+                except UnicodeEncodeError:
+                    print("Active window title contains non-encodable characters.")
+
+                if any(word in title for word in arr):  # Check if any word is in title
+                    # Close the window if a match is found
+                    win32gui.CloseWindow(hwnd)
+                    print("Window closed due to matching title.")
+            else:
+                print("No active window detected.")
+            time.sleep(5)  # Wait for 5 seconds before checking again
+    except KeyboardInterrupt:
+        print("\nTracking stopped.")
