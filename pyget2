@@ -1,0 +1,56 @@
+import pygetwindow as gw
+import psutil
+import time
+import win32gui
+import win32process
+
+# List of keywords to check in the window title
+keywords = [
+    
+]
+
+
+def get_pid_from_hwnd(hwnd):
+    """Get process ID from window handle."""
+    try:
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+        return pid
+    except Exception as e:
+        print(f"Error getting PID from HWND: {e}")
+        return None
+
+
+def close_app_by_pid(pid):
+    """Terminate the application with the given process ID."""
+    try:
+        process = psutil.Process(pid)
+        print(f"Closing application: {process.name()} (PID: {pid})")
+        process.terminate()
+    except Exception as e:
+        print(f"Error closing application: {e}")
+
+
+def monitor_windows():
+    """Monitor windows for specific keywords and close them if necessary."""
+    print("Monitoring active windows. Press Ctrl+C to stop.")
+    try:
+        while True:
+            windows = gw.getWindowsWithTitle("")  # Get all windows
+            for window in windows:
+                title = window.title.lower()  # Convert to lowercase for case-insensitive matching
+                for keyword in keywords:
+                    if keyword in title:
+                        print(f"Keyword '{keyword}' found in title '{
+                              title}'. Closing app...")
+                        hwnd = window._hWnd  # Get the window handle
+                        pid = get_pid_from_hwnd(hwnd)
+                        if pid:
+                            close_app_by_pid(pid)
+                        break
+            time.sleep(5)  # Check every 5 seconds
+    except KeyboardInterrupt:
+        print("\nMonitoring stopped.")
+
+
+if __name__ == "__main__":
+    monitor_windows()
